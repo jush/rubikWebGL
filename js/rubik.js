@@ -2,7 +2,7 @@ var container, stats;
 
 var camera, scene, renderer;
 
-var cube = [];
+var cube= [];
 var numberOfCubes = 6;
 var plane;
 
@@ -49,11 +49,18 @@ function init() {
 
 	}
 
-  for (var i = 0; i < numberOfCubes; i++) {
-    cube[i] = new THREE.Mesh( new THREE.CubeGeometry( 200, 200, 200, 1, 1, 1, materials ), new THREE.MeshFaceMaterial() );
-  	cube[i].position.y = 150 + (i *205);
-	  cube[i].overdraw = true;
-  	scene.addObject( cube[i] );
+  var positionX = 0;
+  for (var row = 0; i < 3; row++) {
+    for (var columns = 0; i < numberOfCubes; columns++) {
+      cube[row] = [];
+      cube[row][columns] = new THREE.Mesh( new THREE.CubeGeometry( 200, 200, 200, 1, 1, 1, materials ), new THREE.MeshFaceMaterial() );
+    	cube[row][columns].position.y = 150 + (columns *205);
+    	cube[row][columns].position.x = positionX;
+  	  cube[row][columns].overdraw = true;
+    	scene.addObject( cube[row][columns]);
+    }
+    positionX += 205;
+    console.log(cube);
   }
 
 	// Plane Shadow
@@ -148,8 +155,8 @@ function animate() {
 }
 
 function render() {
-  for (i = 0; i < numberOfCubes; i++) {
-  	plane.rotation.z = cube[i].rotation.y += ( targetRotation - cube[i].rotation.y ) * 0.05;
+  for (i = 0; i < 2; i++) {
+//  	plane.rotation.z = cube[0][i].rotation.y += ( targetRotation - cube[0][i].rotation.y ) * 0.05;
 	  renderer.render( scene, camera );
   }
 }
