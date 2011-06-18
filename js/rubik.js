@@ -8,12 +8,11 @@ var numberOfCubesRow = 3;
 var numberOfCubesDepth = 3;
 var plane;
 
-var targetRotation = 0;
-var targetRotationOnMouseDown = 0;
-
 var mouseX = 0;
 var mouseXOnMouseDown = 0;
 var mouseIsDown = 0;
+var currentRotation = 0;
+var objectiveRotation = 0;
 
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
@@ -115,41 +114,30 @@ function get_angle_for_piece(x, y) {
     return 0;
 }
 
-function get_snap_angle(angle)
-{
-    if (angle > 7*Math.PI/4) return 4*Math.PI/2;
-    if (angle > 5*Math.PI/4) return 3*Math.PI/2;
-    if (angle > 3*Math.PI/4) return 2*Math.PI/2;
-    if (angle >   Math.PI/4) return   Math.PI/2;
-    return 0;
-}
-
 function render() {
   for (var row = 0; row < numberOfCubesRow; row ++) {
     for (var col = 0; col < numberOfCubesColumn; col++) {
       for (var depth = 0; depth < numberOfCubesDepth; depth++) {
-        z = (215 * (depth - 1));
-        y = (215 * (row - 1));
-        x = (215 * (col - 1));
+        var z = (215 * (depth - 1));
+        var y = (215 * (row - 1));
+        var x = (215 * (col - 1));
 
-        mod = Math.sqrt(x*x + z*z);
-        pos_angle = get_angle_for_piece(col, depth);
+        var mod = Math.sqrt(x*x + z*z);
+        var pos_angle = get_angle_for_piece(col, depth);
 
-        if (!mouseIsDown && targetRotation) {
-            while (targetRotation < 0) targetRotation += (2*Math.PI);
-            targetRotation = targetRotation % (2*Math.PI);
-            snap_angle = get_snap_angle(targetRotation);
-            if (snap_angle != targetRotation) {
-                diff = snap_angle - targetRotation;
-                targetRotation += diff/40;
-            }
+        if (currentRotation != objectiveRotation) {
+            var diff = (objectiveRotation - currentRotation);
+            var steps = 200; // TODO: This should be tuned for slower machines.
+
+            if (diff < 0.01) currentRotation = objectiveRotation;
+            else currentRotation += (objectiveRotation - currentRotation) / steps;
         }
 
         // Right now only this kind of rotation is possible
         if (y == 215) {
-            z = mod * Math.sin(pos_angle + targetRotation);
-            x = mod * Math.cos(pos_angle + targetRotation);
-            cube[row][col][depth].rotation.y = -targetRotation;
+            z = mod * Math.sin(pos_angle + currentRotation);
+            x = mod * Math.cos(pos_angle + currentRotation);
+            cube[row][col][depth].rotation.y = -currentRotation;
         }
 
         cube[row][col][depth].position.x = x;
