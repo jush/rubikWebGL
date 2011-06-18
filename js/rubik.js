@@ -5,6 +5,7 @@ var camera, scene, renderer;
 var cube= [];
 var numberOfCubesColumn = 3;
 var numberOfCubesRow = 3;
+var numberOfCubesDepth = 3;
 var plane;
 
 var targetRotation = 0;
@@ -54,14 +55,14 @@ function init() {
 
   var positionX = 0;
   for (var row = 0; row < numberOfCubesRow; row++) {
-    
     cube[row] = [];
     for (var columns = 0; columns < numberOfCubesColumn; columns++) {
-      cube[row][columns] = new THREE.Mesh( new THREE.CubeGeometry( 200, 200, 200, 1, 1, 1, materials ), new THREE.MeshFaceMaterial() );
-    	cube[row][columns].position.y = 150 + (row *205);
-    	cube[row][columns].position.x = 250 + (columns * 105);
-  	  cube[row][columns].overdraw = true;
-    	scene.addObject( cube[row][columns]);
+      cube[row][columns] = [];
+      for (var depth = 0; depth < numberOfCubesDepth; depth++) {
+        cube[row][columns][depth] = new THREE.Mesh( new THREE.CubeGeometry( 200, 200, 200, 1, 1, 1, materials ), new THREE.MeshFaceMaterial() );
+        cube[row][columns][depth].overdraw = true;
+        scene.addObject( cube[row][columns][depth]);
+      }
     }
     console.log(cube);
   }
@@ -157,15 +158,45 @@ function animate() {
 
 }
 
+// This gets as parameters the 2 coordinates of the piece that are not the
+// normal vector (eg, if the rotation is around X, give Y and Z.)
+// TODO: Make this independant of the order of the rubik cube.
+function get_angle_for_piece(x, y) {
+    step = Math.PI/4;
+    if (x == 0 && y == 0) return step;
+    if (x == 1 && y == 0) return 2*step;
+    if (x == 2 && y == 0) return 3*step;
+    if (x == 2 && y == 1) return 4*step;
+    if (x == 2 && y == 2) return 5*step;
+    if (x == 1 && y == 2) return 6*step;
+    if (x == 0 && y == 2) return 7*step;
+    return 0;
+}
+
 function render() {
-  for (var row =0; row < numberOfCubesRow; row ++) {
-    for (var i = -1; i < numberOfCubesColumn-1; i++) {
-      //cube[0][i].rotation.y += ( targetRotation - cube[0][i].rotation.y ) * 0.05;
-      var column = i + 1;
-      cube[row][column].position.x = (200 * (i)) * Math.cos(targetRotation);
-      cube[row][column].position.z = (200 * (i)) * Math.sin(targetRotation);
-      cube[row][column].rotation.y = -targetRotation;
+  for (var row = 0; row < numberOfCubesRow; row ++) {
+    for (var col = 0; col < numberOfCubesColumn; col++) {
+      for (var depth = 0; depth < numberOfCubesDepth; depth++) {
+        z = (200 * (depth - 1));
+        y = (200 * (row - 1));
+        x = (200 * (col - 1));
+
+        mod = Math.sqrt(x*x + z*z);
+        pos_angle = get_angle_for_piece(col, depth);
+
+        // Right now only this kind of rotation is possible
+        if (y == 200) {
+            z = mod * Math.sin(pos_angle + targetRotation);
+            x = mod * Math.cos(pos_angle + targetRotation);
+            cube[row][col][depth].rotation.y = -targetRotation;
+        }
+
+        cube[row][col][depth].position.x = x;
+        cube[row][col][depth].position.y = y;
+        cube[row][col][depth].position.z = z;
+      }
     }
   }
+
   renderer.render( scene, camera );
 }
