@@ -7,7 +7,7 @@ function onDocumentMouseDown( event ) {
 	document.addEventListener( 'mouseout', onDocumentMouseOut, false );
 
 	mouseXOnMouseDown = event.clientX - windowHalfX;
-    objectiveRotation += Math.PI/2;
+    objectiveRotationX += Math.PI/2;
 }
 
 function onDocumentMouseMove( event ) {
