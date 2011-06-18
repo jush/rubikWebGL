@@ -3,7 +3,8 @@ var container, stats;
 var camera, scene, renderer;
 
 var cube= [];
-var numberOfCubes = 6;
+var numberOfCubesColumn = 3;
+var numberOfCubesRow = 3;
 var plane;
 
 var targetRotation = 0;
@@ -31,10 +32,12 @@ function init() {
 	info.innerHTML = 'Drag to spin the cube';
 	container.appendChild( info );
 
-	camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
-	camera.position.y = 150;
-	camera.position.z = 500;
-	camera.target.position.y = 150;
+	camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 2000 );
+	camera.position.y = 1000;
+	camera.position.z = 700;
+	camera.position.x = 150;
+	camera.target.position.y = 400;
+	camera.target.position.x = 150;
 
 	scene = new THREE.Scene();
 
@@ -50,18 +53,16 @@ function init() {
 	}
 
   var positionX = 0;
-  for (var row = 0; row < 3; row++) {
+  for (var row = 0; row < numberOfCubesRow; row++) {
     
     cube[row] = [];
-    for (var columns = 0; columns < numberOfCubes; columns++) {
-      
+    for (var columns = 0; columns < numberOfCubesColumn; columns++) {
       cube[row][columns] = new THREE.Mesh( new THREE.CubeGeometry( 200, 200, 200, 1, 1, 1, materials ), new THREE.MeshFaceMaterial() );
-    	cube[row][columns].position.y = 150 + (columns *205);
-    	cube[row][columns].position.x = positionX;
+    	cube[row][columns].position.y = 150 + (row *205);
+    	cube[row][columns].position.x = 250 + (columns * 105);
   	  cube[row][columns].overdraw = true;
     	scene.addObject( cube[row][columns]);
     }
-    positionX += 205;
     console.log(cube);
   }
 
@@ -157,9 +158,14 @@ function animate() {
 }
 
 function render() {
-  console.log(cube);
-  for (var i = 0; i < 2; i++) {
-    cube[0][i].rotation.y += ( targetRotation - cube[0][i].rotation.y ) * 0.05;
-	  renderer.render( scene, camera );
+  for (var row =0; row < numberOfCubesRow; row ++) {
+    for (var i = -1; i < numberOfCubesColumn-1; i++) {
+      //cube[0][i].rotation.y += ( targetRotation - cube[0][i].rotation.y ) * 0.05;
+      var column = i + 1;
+      cube[row][column].position.x = (200 * (i)) * Math.cos(targetRotation);
+      cube[row][column].position.z = (200 * (i)) * Math.sin(targetRotation);
+      cube[row][column].rotation.y = -targetRotation;
+    }
   }
+  renderer.render( scene, camera );
 }
