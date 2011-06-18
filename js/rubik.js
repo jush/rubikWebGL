@@ -121,10 +121,8 @@ function get_snap_angle(angle)
     if (angle > 5*Math.PI/4) return 3*Math.PI/2;
     if (angle > 3*Math.PI/4) return 2*Math.PI/2;
     if (angle >   Math.PI/4) return   Math.PI/2;
-    return 4*Math.PI/2;
+    return 0;
 }
-
-var global_var = 0;
 
 function render() {
   for (var row = 0; row < numberOfCubesRow; row ++) {
@@ -138,6 +136,7 @@ function render() {
         pos_angle = get_angle_for_piece(col, depth);
 
         if (!mouseIsDown && targetRotation) {
+            while (targetRotation < 0) targetRotation += (2*Math.PI);
             targetRotation = targetRotation % (2*Math.PI);
             snap_angle = get_snap_angle(targetRotation);
             if (snap_angle != targetRotation) {
