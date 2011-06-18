@@ -50,8 +50,8 @@ function init() {
 	}
 
   var positionX = 0;
-  for (var row = 0; i < 3; row++) {
-    for (var columns = 0; i < numberOfCubes; columns++) {
+  for (var row = 0; row < 3; row++) {
+    for (var columns = 0; columns < numberOfCubes; columns++) {
       cube[row] = [];
       cube[row][columns] = new THREE.Mesh( new THREE.CubeGeometry( 200, 200, 200, 1, 1, 1, materials ), new THREE.MeshFaceMaterial() );
     	cube[row][columns].position.y = 150 + (columns *205);
@@ -156,7 +156,7 @@ function animate() {
 
 function render() {
   for (i = 0; i < 2; i++) {
-//  	plane.rotation.z = cube[0][i].rotation.y += ( targetRotation - cube[0][i].rotation.y ) * 0.05;
+ // 	plane.rotation.z = cube[0][i].rotation.y += ( targetRotation - cube[0][i].rotation.y ) * 0.05;
 	  renderer.render( scene, camera );
   }
 }
