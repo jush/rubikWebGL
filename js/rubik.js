@@ -13,9 +13,12 @@ var targetRotationOnMouseDown = 0;
 
 var mouseX = 0;
 var mouseXOnMouseDown = 0;
+var mouseIsDown = 0;
 
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
+
+
 
 init();
 animate();
@@ -100,13 +103,14 @@ function onDocumentMouseDown( event ) {
 
 	mouseXOnMouseDown = event.clientX - windowHalfX;
 	targetRotationOnMouseDown = targetRotation;
+    mouseIsDown = 1;
 }
 
 function onDocumentMouseMove( event ) {
 
 	mouseX = event.clientX - windowHalfX;
 
-	targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.02;
+	targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.005;
 }
 
 function onDocumentMouseUp( event ) {
@@ -114,6 +118,7 @@ function onDocumentMouseUp( event ) {
 	document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 	document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
 	document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+    mouseIsDown = 0;
 }
 
 function onDocumentMouseOut( event ) {
@@ -173,19 +178,39 @@ function get_angle_for_piece(x, y) {
     return 0;
 }
 
+function get_snap_angle(angle)
+{
+    if (angle > 7*Math.PI/4) return 4*Math.PI/2;
+    if (angle > 5*Math.PI/4) return 3*Math.PI/2;
+    if (angle > 3*Math.PI/4) return 2*Math.PI/2;
+    if (angle >   Math.PI/4) return   Math.PI/2;
+    return 4*Math.PI/2;
+}
+
+var global_var = 0;
+
 function render() {
   for (var row = 0; row < numberOfCubesRow; row ++) {
     for (var col = 0; col < numberOfCubesColumn; col++) {
       for (var depth = 0; depth < numberOfCubesDepth; depth++) {
-        z = (200 * (depth - 1));
-        y = (200 * (row - 1));
-        x = (200 * (col - 1));
+        z = (215 * (depth - 1));
+        y = (215 * (row - 1));
+        x = (215 * (col - 1));
 
         mod = Math.sqrt(x*x + z*z);
         pos_angle = get_angle_for_piece(col, depth);
 
+        if (!mouseIsDown && targetRotation) {
+            targetRotation = targetRotation % (2*Math.PI);
+            snap_angle = get_snap_angle(targetRotation);
+            if (snap_angle != targetRotation) {
+                diff = snap_angle - targetRotation;
+                targetRotation += diff/40;
+            }
+        }
+
         // Right now only this kind of rotation is possible
-        if (y == 200) {
+        if (y == 215) {
             z = mod * Math.sin(pos_angle + targetRotation);
             x = mod * Math.cos(pos_angle + targetRotation);
             cube[row][col][depth].rotation.y = -targetRotation;
