@@ -137,12 +137,12 @@ function render() {
         var y = (215 * (row - 1));
         var x = (215 * (col - 1));
 
-        var mod = Math.sqrt(x*x + z*z);
-        var pos_angle = get_angle_for_piece(col, depth);
 
         if (currentRotationY != objectiveRotationY) {
             currentRotationY = get_rotation_step(currentRotationY, objectiveRotationY);
             if (row == layerRotationY) {
+                var mod = Math.sqrt(x*x + z*z);
+                var pos_angle = get_angle_for_piece(col, depth);
                 z = mod * Math.sin(pos_angle + currentRotationY);
                 x = mod * Math.cos(pos_angle + currentRotationY);
                 cube[row][col][depth].rotation.y = -currentRotationY;
@@ -150,7 +150,8 @@ function render() {
         } else if (currentRotationX != objectiveRotationX) {
             currentRotationX = get_rotation_step(currentRotationX, objectiveRotationX);
             if (col == layerRotationX) {
-                console.log(row + " " + depth);
+                var mod = Math.sqrt(y*y + z*z);
+                var pos_angle = get_angle_for_piece(depth, row);
                 y = mod * Math.sin(pos_angle + currentRotationX);
                 z = mod * Math.cos(pos_angle + currentRotationX);
                 cube[row][col][depth].rotation.x = -currentRotationX;
@@ -158,6 +159,8 @@ function render() {
         } else if (currentRotationZ != objectiveRotationZ) {
             currentRotationZ = get_rotation_step(currentRotationZ, objectiveRotationZ);
             if (depth == layerRotationZ) {
+                var mod = Math.sqrt(x*x + y*y);
+                var pos_angle = get_angle_for_piece(row, col);
                 x = mod * Math.sin(pos_angle + currentRotationZ);
                 y = mod * Math.cos(pos_angle + currentRotationZ);
                 cube[row][col][depth].rotation.z = -currentRotationZ;
